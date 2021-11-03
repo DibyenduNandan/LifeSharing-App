@@ -3,6 +3,18 @@ const mongoose=require('mongoose');
 const jwt = require('jsonwebtoken');
 const User=mongoose.model('User');
 const router = express.Router();
+
+const fs = require('fs');
+const TextToSpeechV1 = require('ibm-watson/text-to-speech/v1');
+const { IamAuthenticator } = require('ibm-watson/auth');
+
+const textToSpeech = new TextToSpeechV1({
+    authenticator: new IamAuthenticator({
+      apikey: `nD0Y1xV-NEKugtYNwSZzygX1qiTgupOO0ocilzlNxTnr`,
+    }),
+    serviceUrl: 'https://api.eu-gb.text-to-speech.watson.cloud.ibm.com/instances/ecb2e383-1ee1-4ef4-8ae2-118c98a7271e',
+  });
+
 router.post('/donner',async(req,res)=>{
   const {user,donner}=req.body;
   try{
@@ -24,6 +36,25 @@ router.get('/get_donner',async(req,res)=>{
 router.post('/signup', async(req,res)=>{
     const {name,email,password,number}=req.body;
     console.log(req.body);
+    const text='User name is'+name+' Email is '+email+'Phone Number '+number;
+    console.log(text);
+    const synthesizeParams = {
+      text: text,
+      accept: 'audio/wav',
+      voice: 'en-US_AllisonV3Voice',
+    };
+
+    await textToSpeech.synthesize(synthesizeParams)
+    .then(response => {
+      return textToSpeech.repairWavHeaderStream(response.result);
+    })
+    .then(buffer => {
+      fs.writeFileSync('user_detail.wav', buffer);
+    })
+    .catch(err => {
+      console.log('error:', err);
+    });
+
     try{
         const user= new User({name,email,password,number});
         await user.save();

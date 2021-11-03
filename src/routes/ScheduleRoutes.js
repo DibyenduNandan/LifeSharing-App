@@ -47,8 +47,11 @@ router.get('/schedule', async(req,res) =>{
 });
 
 router.get('/get_schedule', async (req, res) => {
-  const schedule = await Schedule.find({ userId: req.user._id });
-  console.log(schedule);
+  var schedule = await Schedule.find({ userId: req.user._id });
+  console.log(schedule.length);
+  if(schedule.length==0){
+    schedule=[{userId:req.user._id}]
+  }
   res.send(schedule);
 });
 

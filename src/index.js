@@ -80,14 +80,18 @@ app.post('/upload-profile',requireAuth,uploads.single('profile'),async(req,res)=
 
 app.get('/',requireAuth,(req,res) => {
     const img=req.user.avtar;
-    const b64 = Buffer.from(img).toString('base64');
-    const base64Icon='data:image/png;base64,'+b64;
+    var base64Icon='';
+    if(img!=null){
+      const b64 = Buffer.from(img).toString('base64');
+      base64Icon='data:image/png;base64,'+b64;
+    }
     const email=req.user.email;
     // console.log(email);
     res.send({ email,base64Icon });
     // res.send(`Your email: ${req.user.email} and profile Image: ${base64Icon}`);
 });
 
+console.log(port)
 app.listen(port,()=>{
     console.log('Listening on  port 3000');
 });
