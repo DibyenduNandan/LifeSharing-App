@@ -87,8 +87,11 @@ router.post('/signin', async (req, res) => {
       // console.log('passed');
       const token = jwt.sign({ userId: user._id }, 'MY_SECRETE_KEY');
       const img=user.avtar;
-      const b64 = Buffer.from(img).toString('base64');
-      const base64Icon='data:image/png;base64,'+b64;
+      let base64Icon=null;
+      if(img){
+        const b64 = Buffer.from(img).toString('base64');
+        base64Icon='data:image/png;base64,'+b64;
+      }
       // console.log(typeof(base64Icon));
       // console.log(base64Icon);
       res.send({ token,email,base64Icon });
